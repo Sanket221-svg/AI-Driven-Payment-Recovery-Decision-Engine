@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RecoverAI | Smart Recovery Dashboard</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #111b2e;
+            --panel-alt: #0f172a;
+            --surface: #162336;
+            --surface-strong: #1b2b42;
+            --border: rgba(148, 163, 184, 0.18);
+            --text: #e5eefb;
+            --muted: #93a4bf;
+            --primary: #60a5fa;
+            --primary-soft: rgba(96, 165, 250, 0.12);
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --shadow: 0 12px 32px rgba(2, 6, 23, 0.42);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .page {
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 28px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .brand-mark {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 12px rgba(52, 211, 153, 0.8);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.65);
+            color: var(--text);
+            font-size: 0.8rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.9);
+        }
+
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 20px;
+            background: rgba(17, 27, 46, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(2rem, 2.8vw, 3rem);
+            line-height: 1.1;
+        }
+
+        .brand-compact {
+            font-size: 0.78rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--success);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero-subtitle {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .hero-note {
+            margin-top: 10px;
+            color: #dbeafe;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .hero .mini-stat {
+            min-width: 220px;
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+        }
+
+        .mini-stat .label {
+            color: var(--muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .mini-stat .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 420px minmax(0, 1fr);
+            gap: 24px;
+        }
+
+        .panel {
+            background: rgba(17, 27, 46, 0.94);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-title {
+            margin: 0 0 18px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .preset-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preset-btn {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(148, 163, 184, 0.03);
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            border-color: rgba(96, 165, 250, 0.5);
+            background: var(--primary-soft);
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field label {
+            color: var(--muted);
+            font-size: 0.82rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            padding: 12px 14px;
+            font-size: 0.98rem;
+            outline: none;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: rgba(96, 165, 250, 0.8);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+        }
+
+        .helper {
+            color: var(--muted);
+            font-size: 0.75rem;
+            line-height: 1.5;
+            margin-top: -4px;
+        }
+
+        .toggle-wrap {
+            background: rgba(248, 113, 113, 0.06);
+            border: 1px solid rgba(248, 113, 113, 0.35);
+            border-radius: 12px;
+            padding: 14px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-wrap.warning-active {
+            background: rgba(248, 113, 113, 0.12);
+            border-color: rgba(248, 113, 113, 0.7);
+        }
+
+        .toggle-text {
+            display: grid;
+            gap: 4px;
+        }
+
+        .toggle-text strong {
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--danger);
+        }
+
+        .toggle-text span {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 54px;
+            height: 30px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(148, 163, 184, 0.35);
+            border-radius: 999px;
+            transition: 0.2s ease;
+            cursor: pointer;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            left: 4px;
+            top: 4px;
+            border-radius: 50%;
+            background: white;
+            transition: 0.2s ease;
+        }
+
+        input:checked + .slider {
+            background: rgba(248, 113, 113, 0.9);
+        }
+
+        input:checked + .slider::before {
+            transform: translateX(24px);
+        }
+
+        .primary-btn {
+            width: 100%;
+            margin-top: 6px;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 18px;
+            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+            color: white;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 12px 22px rgba(59, 130, 246, 0.28);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            display: grid;
+            gap: 22px;
+        }
+
+        .alert {
+            display: none;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            border: 1px solid transparent;
+        }
+
+        .alert.success {
+            display: block;
+            background: rgba(52, 211, 153, 0.08);
+            border-color: rgba(52, 211, 153, 0.4);
+            color: #a7f3d0;
+        }
+
+        .alert.warning {
+            display: block;
+            background: rgba(248, 113, 113, 0.08);
+            border-color: rgba(248, 113, 113, 0.45);
+            color: #fecaca;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .stat-box {
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 12px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .stat-value {
+            margin-top: 10px;
+            font-weight: 700;
+            font-size: clamp(1.2rem, 1.5vw, 1.7rem);
+        }
+
+        .benefit {
+            color: var(--success);
+        }
+
+        .event-status-strip {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .event-pill {
+            background: rgba(148, 163, 184, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .event-pill .label {
+            display: block;
+            color: var(--muted);
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .event-pill strong {
+            font-size: 1rem;
+        }
+
+        .event-pill.ready {
+            border-color: rgba(52, 211, 153, 0.35);
+            background: rgba(52, 211, 153, 0.06);
+        }
+
+        .event-pill.processing {
+            border-color: rgba(96, 165, 250, 0.35);
+            background: rgba(96, 165, 250, 0.06);
+        }
+
+        .event-pill.warning {
+            border-color: rgba(248, 113, 113, 0.35);
+            background: rgba(248, 113, 113, 0.06);
+        }
+
+        .aux-btn {
+            width: 100%;
+            margin-top: 10px;
+            border: 1px solid rgba(96, 165, 250, 0.5);
+            background: rgba(96, 165, 250, 0.08);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .reason-card,
+        .flow-card,
+        .matrix-card,
+        .mini-card {
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 18px 14px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+            margin-bottom: 14px;
+        }
+
+        .summary-box {
+            background: rgba(148, 163, 184, 0.025);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .summary-box .label {
+            display: block;
+            color: var(--muted);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .summary-box strong {
+            display: block;
+            font-size: 1.2rem;
+            line-height: 1.3;
+        }
+
+        .compare-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .compare-box {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            background: rgba(148, 163, 184, 0.02);
+        }
+
+        .compare-box .label {
+            display: block;
+            color: var(--muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .verdict-block {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .verdict-block .label {
+            display: block;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .decision-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .final-decision {
+            background: rgba(17, 27, 46, 0.94);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .final-decision-main {
+            font-size: clamp(1.6rem, 2vw, 2.2rem);
+            font-weight: 800;
+            margin: 8px 0 12px;
+        }
+
+        .final-decision-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .final-meta-box {
+            background: rgba(148, 163, 184, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .final-meta-box .label {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .mini-card h3 {
+            margin: 0 0 12px;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .mini-card p {
+            margin: 0;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .env-banner {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(52, 211, 153, 0.08);
+            color: #d1fae5;
+            display: none;
+        }
+
+        .env-banner.warning {
+            background: rgba(248, 113, 113, 0.08);
+            border-color: rgba(248, 113, 113, 0.4);
+            color: #fecaca;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: 1px solid var(--border);
+        }
+
+        .status-badge.optimal {
+            background: rgba(52, 211, 153, 0.08);
+            border-color: rgba(52, 211, 153, 0.35);
+            color: #a7f3d0;
+        }
+
+        .status-badge.not-selected {
+            background: rgba(148, 163, 184, 0.05);
+            color: var(--muted);
+        }
+
+        .status-badge.tied {
+            background: rgba(251, 191, 36, 0.08);
+            border-color: rgba(251, 191, 36, 0.4);
+            color: #fef3c7;
+        }
+
+        .matrix-wrap {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .trace-card {
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .trace-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .trace-item {
+            background: rgba(148, 163, 184, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .trace-item .label {
+            display: block;
+            color: var(--muted);
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        table {
+            min-width: 720px;
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid,
+            .summary-grid,
+            .decision-grid,
+            .compare-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .stat-grid,
+            .summary-grid,
+            .decision-grid,
+            .compare-row,
+            .event-status-strip {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            color: var(--muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .reason-card p,
+        .flow-card p {
+            margin: 0;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .flow-track {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .flow-step {
+            border: 1px solid var(--border);
+            background: rgba(148, 163, 184, 0.04);
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .flow-step.active {
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.7);
+            color: var(--text);
+        }
+
+        .flow-step.blocked {
+            background: rgba(248, 113, 113, 0.1);
+            border-color: rgba(248, 113, 113, 0.7);
+            color: #fecaca;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.92rem;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 0.73rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        tr.optimal td {
+            background: rgba(96, 165, 250, 0.06);
+        }
+
+        td strong {
+            color: var(--text);
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 5px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: 1px solid var(--border);
+        }
+
+        .pill.good {
+            background: rgba(52, 211, 153, 0.08);
+            border-color: rgba(52, 211, 153, 0.3);
+            color: #a7f3d0;
+        }
+
+        .pill.warn {
+            background: rgba(248, 113, 113, 0.08);
+            border-color: rgba(248, 113, 113, 0.3);
+            color: #fecaca;
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="topbar">
+            <div class="brand">
+                <span class="brand-mark"></span>
+                RecoverAI
+            </div>
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                System Ready
+            </div>
+        </div>
+
+        <header class="hero">
+            <div>
+                <div class="brand-compact">RecoverAI</div>
+                <h1>AI-Driven Payment Recovery Decision Engine</h1>
+                <div class="hero-subtitle">Predict → Compare → Optimize → Execute</div>
+                <div class="hero-note">Not every failed payment should be retried.</div>
+            </div>
+            <div class="mini-stat">
+                <span class="label">Policy Mode</span>
+                <div class="value">Live Optimization</div>
+            </div>
+        </header>
+
+        <div class="layout">
+            <aside class="panel">
+                <h2 class="panel-title">Inject Payment Failure Event</h2>
+
+                <div class="preset-row">
+                    <button class="preset-btn" data-scenario="normal">Normal Timeout</button>
+                    <button class="preset-btn" data-scenario="balance">Insufficient Balance</button>
+                    <button class="preset-btn" data-scenario="expired">Expired Card</button>
+                    <button class="preset-btn" data-scenario="risk">Risk Flagged</button>
+                    <button class="preset-btn" data-scenario="bankoutage" style="grid-column: 1 / -1;">Bank Outage</button>
+                </div>
+
+                <div class="event-status-strip">
+                    <div class="event-pill ready" id="eventStatusBox">
+                        <span class="label">Event Status</span>
+                        <strong id="eventStatusLabel">READY</strong>
+                    </div>
+                    <div class="event-pill" id="paymentIdBox">
+                        <span class="label">Payment ID</span>
+                        <strong id="eventPaymentId">pay_demo_100231</strong>
+                    </div>
+                </div>
+
+                <form id="webhookForm">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="payment_id">Payment ID</label>
+                            <input id="payment_id" type="text" value="pay_demo_100231" />
+                            <div class="helper">Unique payment identifier for retry orchestration and audit tracking.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="amount">Amount at Risk</label>
+                            <input id="amount" type="number" value="8500" step="100" min="0" />
+                            <div class="helper">Amount in INR used to calculate expected economic value and guardrails.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="failureCode">Failure Code</label>
+                            <select id="failureCode">
+                                <option value="NETWORK_TIMEOUT">NETWORK_TIMEOUT</option>
+                                <option value="INSUFFICIENT_BALANCE">INSUFFICIENT_BALANCE</option>
+                                <option value="EXPIRED_CARD">EXPIRED_CARD</option>
+                                <option value="RISK_FLAGGED">RISK_FLAGGED</option>
+                            </select>
+                            <div class="helper">Specific gateway or issuer failure mode that drives model scoring.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="customerValue">Customer Value Tier</label>
+                            <select id="customerValue">
+                                <option value="LOW">LOW</option>
+                                <option value="MEDIUM">MEDIUM</option>
+                                <option value="HIGH" selected>HIGH</option>
+                            </select>
+                            <div class="helper">Customer lifetime value tier influences probability calibration and monetization logic.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="successRate">Historical Success Rate</label>
+                            <input id="successRate" type="number" value="0.91" min="0" max="1" step="0.01" />
+                            <div class="helper">Past conversion success rate used to calibrate retry likelihood.</div>
+                        </div>
+
+                        <div class="toggle-wrap" id="bankOutageWrap">
+                            <div class="toggle-text">
+                                <strong>Bank Outage Simulation</strong>
+                                <span>Idempotent downgrade of retry confidence under degraded rails.</span>
+                            </div>
+                            <label class="switch">
+                                <input id="bankOutage" type="checkbox" />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <button class="primary-btn" id="submitBtn" type="submit">Run AI Optimization</button>
+                        <button class="aux-btn" id="duplicateBtn" type="button">Test Duplicate Protection</button>
+                    </div>
+                </form>
+            </aside>
+
+            <main class="panel results">
+                <div id="statusBanner" class="alert"></div>
+
+                <div class="final-decision">
+                    <div class="section-head">
+                        <span>FINAL BUSINESS DECISION</span>
+                        <span class="pill" id="finalDecisionBadge">LIVE</span>
+                    </div>
+                    <div class="final-decision-main" id="finalDecisionLabel">--</div>
+                    <div class="final-decision-meta">
+                        <div class="final-meta-box">
+                            <span class="label">Expected Net Value</span>
+                            <strong id="finalDecisionNet">₹0.00</strong>
+                        </div>
+                        <div class="final-meta-box">
+                            <span class="label">P(Recovery)</span>
+                            <strong id="finalDecisionProb">0.0%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-status-strip">
+                    <div class="event-pill ready">
+                        <span class="label">Current Event</span>
+                        <strong id="currentEventLabel">EVENT READY</strong>
+                    </div>
+                    <div class="event-pill">
+                        <span class="label">Status</span>
+                        <strong id="currentStatusText">READY</strong>
+                    </div>
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Recommended Action</div>
+                        <div class="stat-value" id="resAction">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">P(Recovery)</div>
+                        <div class="stat-value" id="resProb">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Expected Net</div>
+                        <div class="stat-value" id="resNet">₹0.00</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Costs Saved</div>
+                        <div class="stat-value benefit" id="resSaved">₹0.00</div>
+                    </div>
+                </div>
+
+                <div class="reason-card">
+                    <div class="section-head">
+                        <span>WHY THIS ACTION?</span>
+                        <span class="pill" id="decisionBadge">OPTIMIZED</span>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-box">
+                            <span class="label">Winning Action</span>
+                            <strong id="summaryAction">--</strong>
+                        </div>
+                        <div class="summary-box">
+                            <span class="label">P(Recovery)</span>
+                            <strong id="summaryProb">--</strong>
+                        </div>
+                        <div class="summary-box">
+                            <span class="label">Expected Net Value</span>
+                            <strong id="summaryNet">₹0.00</strong>
+                        </div>
+                    </div>
+
+                    <div class="compare-row">
+                        <div class="compare-box">
+                            <span class="label">Next Best Alternative</span>
+                            <strong id="nextBestAlt">--</strong>
+                        </div>
+                        <div class="compare-box">
+                            <span class="label">Expected Advantage</span>
+                            <strong id="expectedAdvantage">₹0.00</strong>
+                        </div>
+                    </div>
+
+                    <div class="verdict-block">
+                        <span class="label">BUSINESS VERDICT</span>
+                        <p id="businessVerdict">Run a simulation to evaluate the recovery decision.</p>
+                    </div>
+                </div>
+
+                <div class="decision-grid">
+                    <div class="mini-card">
+                        <h3 id="whyNotRetryTitle">WHY NOT RETRY?</h3>
+                        <p id="whyNotRetry">Decision not yet evaluated.</p>
+                    </div>
+                    <div class="mini-card">
+                        <h3>MODEL VS POLICY</h3>
+                        <p id="modelPolicyText">Model recommendation and final policy decision are shown here after evaluation.</p>
+                    </div>
+                </div>
+
+                <div class="env-banner" id="environmentBanner"></div>
+
+                <div class="flow-card">
+                    <div class="section-head">
+                        <span>Decision Flow</span>
+                        <span class="pill good" id="flowBadge">Pass</span>
+                    </div>
+                    <p id="flowDescription">ML Prediction → Policy Guardrails → Economic Optimization → Action Execution</p>
+                    <div class="flow-track">
+                        <div class="flow-step active">ML Prediction</div>
+                        <div class="flow-step active">Policy Guardrails</div>
+                        <div class="flow-step active">Economic Optimization</div>
+                        <div class="flow-step active">Action Execution</div>
+                    </div>
+                </div>
+
+                <div class="matrix-card">
+                    <div class="section-head">
+                        <span>COUNTERFACTUAL MATRIX</span>
+                        <span class="pill" id="matrixBadge">REGRET ANALYSIS</span>
+                    </div>
+                    <div style="color: var(--muted); margin-bottom: 10px;">What would happen if we chose another recovery action?</div>
+                    <div class="matrix-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>P(Recovery)</th>
+                                    <th>Expected Net</th>
+                                    <th>Execution Cost</th>
+                                    <th>Expected Regret</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matrixBody">
+                                <tr><td colspan="6" style="color: var(--muted);">Simulation not yet run.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="trace-card">
+                    <div class="section-head">
+                        <span>DECISION TRACE</span>
+                        <span class="pill" id="traceBadge">LIVE</span>
+                    </div>
+                    <div class="trace-grid" id="decisionTraceGrid">
+                        <div class="trace-item"><span class="label">Event ID</span><strong id="traceEventId">—</strong></div>
+                        <div class="trace-item"><span class="label">Payment ID</span><strong id="tracePaymentId">—</strong></div>
+                        <div class="trace-item"><span class="label">Amount</span><strong id="traceAmount">—</strong></div>
+                        <div class="trace-item"><span class="label">Failure Code</span><strong id="traceFailureCode">—</strong></div>
+                        <div class="trace-item"><span class="label">Model Recommendation</span><strong id="traceModel">—</strong></div>
+                        <div class="trace-item"><span class="label">Policy Status</span><strong id="tracePolicy">—</strong></div>
+                        <div class="trace-item"><span class="label">Winning Action</span><strong id="traceAction">—</strong></div>
+                        <div class="trace-item"><span class="label">Expected Net</span><strong id="traceNet">—</strong></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const presetConfig = {
+            normal: {
+                payment_id: 'pay_demo_timeout_01',
+                amount: 4200,
+                failureCode: 'NETWORK_TIMEOUT',
+                customerValue: 'HIGH',
+                successRate: 0.89,
+                bankOutage: false
+            },
+            balance: {
+                payment_id: 'pay_demo_balance_02',
+                amount: 18500,
+                failureCode: 'INSUFFICIENT_BALANCE',
+                customerValue: 'HIGH',
+                successRate: 0.91,
+                bankOutage: false
+            },
+            expired: {
+                payment_id: 'pay_demo_expired_03',
+                amount: 6200,
+                failureCode: 'EXPIRED_CARD',
+                customerValue: 'MEDIUM',
+                successRate: 0.72,
+                bankOutage: false
+            },
+            risk: {
+                payment_id: 'pay_demo_risk_04',
+                amount: 93000,
+                failureCode: 'RISK_FLAGGED',
+                customerValue: 'HIGH',
+                successRate: 0.68,
+                bankOutage: false
+            },
+            bankoutage: {
+                payment_id: 'pay_demo_bankoutage_05',
+                amount: 14200,
+                failureCode: 'NETWORK_TIMEOUT',
+                customerValue: 'HIGH',
+                successRate: 0.84,
+                bankOutage: true
+            }
+        };
+
+        const ACTION_LABELS = {
+            RETRY_IMMEDIATE: '🔄 Retry Payment',
+            RETRY_6H: '🕒 Retry Later',
+            PAYMENT_REMINDER: '📩 Send Payment Reminder',
+            ALTERNATE_METHOD: '💳 Suggest Alternate Payment',
+            DO_NOTHING: '⏸ Do Nothing',
+            HUMAN_REVIEW: '👤 Escalate to Human'
+        };
+
+        const processedPaymentIds = new Set();
+        const API_BASE_URLS = ['http://127.0.0.1:8000', 'http://127.0.0.1:8001', 'http://127.0.0.1:64577'];
+
+        async function apiRequest(path, payload) {
+            let lastError = null;
+            for (const baseUrl of API_BASE_URLS) {
+                try {
+                    const response = await fetch(`${baseUrl}${path}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) {
+                        return response;
+                    }
+                    lastError = new Error(`HTTP ${response.status}`);
+                } catch (error) {
+                    lastError = error;
+                }
+            }
+            throw lastError || new Error('Unable to reach the RecoverAI API.');
+        }
+
+        function safeNumber(value, fallback = 0) {
+            const num = Number(value);
+            return Number.isFinite(num) ? num : fallback;
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(safeNumber(value, 0));
+        }
+
+        function formatPercent(value) {
+            return `${(safeNumber(value, 0) * 100).toFixed(1)}%`;
+        }
+
+        function humanizeAction(action) {
+            if (!action) return '--';
+            return ACTION_LABELS[action] || action.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+        }
+
+        function getValue(data, ...keys) {
+            for (const key of keys) {
+                if (data && Object.prototype.hasOwnProperty.call(data, key)) {
+                    return data[key];
+                }
+            }
+            return null;
+        }
+
+        function generateDemoPaymentId() {
+            const randomPart = Math.floor(Math.random() * 900000) + 100000;
+            return `pay_demo_${randomPart}`;
+        }
+
+        function setEventStatus(status, message) {
+            const label = document.getElementById('eventStatusLabel');
+            const text = document.getElementById('currentStatusText');
+            const currentEvent = document.getElementById('currentEventLabel');
+            const statusBox = document.getElementById('eventStatusBox');
+            const paymentBox = document.getElementById('paymentIdBox');
+
+            label.textContent = status;
+            text.textContent = status;
+            currentEvent.textContent = status === 'READY'
+                ? 'EVENT READY'
+                : status === 'PROCESSING'
+                    ? 'PROCESSING'
+                    : status === 'PROCESSED'
+                        ? 'PROCESSED'
+                        : status === 'DUPLICATE BLOCKED'
+                            ? 'DUPLICATE BLOCKED'
+                            : 'SIMULATION';
+
+            statusBox.className = 'event-pill ' + (
+                status === 'DUPLICATE BLOCKED' || status === 'WARNING' ? 'warning' :
+                status === 'PROCESSING' ? 'processing' : 'ready'
+            );
+
+            paymentBox.className = 'event-pill ' + (
+                status === 'DUPLICATE BLOCKED' || status === 'WARNING' ? 'warning' : ''
+            );
+
+            const banner = document.getElementById('statusBanner');
+            if (message) {
+                banner.className = status === 'DUPLICATE BLOCKED' ? 'alert warning' : 'alert success';
+                banner.textContent = message;
+            }
+        }
+
+        function fillScenario(name) {
+            const data = presetConfig[name];
+            if (!data) return;
+
+            const paymentId = generateDemoPaymentId();
+            document.getElementById('payment_id').value = paymentId;
+            document.getElementById('eventPaymentId').textContent = paymentId;
+            document.getElementById('amount').value = data.amount;
+            document.getElementById('failureCode').value = data.failureCode;
+            document.getElementById('customerValue').value = data.customerValue;
+            document.getElementById('successRate').value = data.successRate;
+            document.getElementById('bankOutage').checked = data.bankOutage;
+            updateBankOutageState();
+            setEventStatus('READY', 'EVENT READY ✓ New payment event generated');
+        }
+
+        function updateBankOutageState() {
+            const active = document.getElementById('bankOutage').checked;
+            const wrap = document.getElementById('bankOutageWrap');
+            wrap.classList.toggle('warning-active', active);
+            const strong = wrap.querySelector('strong');
+            strong.textContent = active ? 'BANK OUTAGE SIMULATION ACTIVE' : 'Bank Outage Simulation';
+        }
+
+        function renderMatrix(matrixRows, finalAction) {
+            const matrixBody = document.getElementById('matrixBody');
+            matrixBody.innerHTML = '';
+
+            const sorted = Array.isArray(matrixRows) ? [...matrixRows].sort((a, b) => {
+                const aNet = safeNumber(getValue(a, 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0));
+                const bNet = safeNumber(getValue(b, 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0));
+                return bNet - aNet;
+            }) : [];
+
+            const bestNet = sorted.length ? safeNumber(getValue(sorted[0], 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0)) : 0;
+            const tieSet = new Set();
+            for (const row of sorted) {
+                const net = safeNumber(getValue(row, 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0));
+                if (Math.abs(net - bestNet) < 0.01) {
+                    tieSet.add(getValue(row, 'action_name', 'action', 'name'));
+                }
+            }
+
+            sorted.forEach((row) => {
+                const actionName = getValue(row, 'action_name', 'action', 'name');
+                const probability = safeNumber(getValue(row, 'probability', 'model_probability', 'prob', 0));
+                const expectedValue = safeNumber(getValue(row, 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0));
+                const executionCost = safeNumber(getValue(row, 'execution_cost', 'cost', 0));
+                const expectedRegret = safeNumber(getValue(row, 'expected_regret', 'regret_value', 'regret', 0));
+                const finalSelected = actionName === finalAction;
+                const tiedOptimal = tieSet.has(actionName);
+                let status = 'NOT SELECTED';
+                let statusClass = 'not-selected';
+                if (finalSelected && tiedOptimal) {
+                    status = 'TIED OPTIMAL';
+                    statusClass = 'tied';
+                } else if (finalSelected) {
+                    status = 'OPTIMAL';
+                    statusClass = 'optimal';
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${humanizeAction(actionName)}</strong></td>
+                    <td>${formatPercent(probability)}</td>
+                    <td>${formatCurrency(expectedValue)}</td>
+                    <td>${formatCurrency(executionCost)}</td>
+                    <td>${expectedRegret > 0 && !tiedOptimal ? formatCurrency(expectedRegret) : '—'}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                `;
+                matrixBody.appendChild(tr);
+            });
+        }
+
+        function setDuplicateWarning(paymentId) {
+            const banner = document.getElementById('statusBanner');
+            banner.className = 'alert warning';
+            banner.textContent = `⚠ DUPLICATE EVENT BLOCKED\nPayment ID: ${paymentId}\nReason: This payment event has already been processed. Duplicate webhook protection prevented reprocessing.`;
+            setEventStatus('DUPLICATE BLOCKED', '⚠ DUPLICATE EVENT BLOCKED');
+        }
+
+        function setEnvironmentBanner(simulateOutage) {
+            const banner = document.getElementById('environmentBanner');
+            if (simulateOutage) {
+                banner.className = 'env-banner warning';
+                banner.textContent = '⚠ ENVIRONMENT SHIFT DETECTED — Recovery probabilities are being evaluated under simulated degraded conditions.';
+                banner.style.display = 'block';
+            } else {
+                banner.className = 'env-banner';
+                banner.textContent = 'ENVIRONMENT ✓ Normal payment conditions';
+                banner.style.display = 'block';
+            }
+        }
+
+        document.getElementById('bankOutage').addEventListener('change', updateBankOutageState);
+
+        document.querySelectorAll('.preset-btn').forEach((button) => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                fillScenario(button.dataset.scenario);
+            });
+        });
+
+        document.getElementById('duplicateBtn').addEventListener('click', async function () {
+            const paymentId = document.getElementById('payment_id').value;
+            const payload = {
+                payment_id: paymentId,
+                amount_inr: Number(document.getElementById('amount').value),
+                payment_method: document.getElementById('failureCode').value === 'EXPIRED_CARD' ? 'CARD' : 'UPI',
+                failure_code: document.getElementById('failureCode').value,
+                customer_value: document.getElementById('customerValue').value,
+                customer_success_rate: Number(document.getElementById('successRate').value),
+                simulate_bank_outage: document.getElementById('bankOutage').checked,
+                failure_source: 'bank',
+                attempt_number: 2,
+                merchant_id: 'mch_12'
+            };
+
+            try {
+                await fetch('http://127.0.0.1:8001/webhook/payment_failed', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                await fetch('http://127.0.0.1:8001/webhook/payment_failed', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (error) {
+                const duplicateMessage = error.message || 'Duplicate webhook protection prevented reprocessing.';
+                setDuplicateWarning(paymentId);
+                document.getElementById('statusBanner').textContent = `⚠ DUPLICATE EVENT BLOCKED\nPayment ID: ${paymentId}\nReason: ${duplicateMessage}`;
+            }
+        });
+
+        document.getElementById('webhookForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Evaluating...';
+
+            const paymentId = document.getElementById('payment_id').value;
+            const payload = {
+                payment_id: paymentId,
+                amount_inr: Number(document.getElementById('amount').value),
+                payment_method: document.getElementById('failureCode').value === 'EXPIRED_CARD' ? 'CARD' : 'UPI',
+                failure_code: document.getElementById('failureCode').value,
+                customer_value: document.getElementById('customerValue').value,
+                customer_success_rate: Number(document.getElementById('successRate').value),
+                simulate_bank_outage: document.getElementById('bankOutage').checked,
+                failure_source: 'bank',
+                attempt_number: 2,
+                merchant_id: 'mch_12'
+            };
+
+            if (processedPaymentIds.has(paymentId)) {
+                setDuplicateWarning(paymentId);
+                btn.disabled = false;
+                btn.textContent = 'Run AI Optimization';
+                return;
+            }
+
+            setEventStatus('PROCESSING', 'Decision engine is running...');
+            document.getElementById('eventPaymentId').textContent = paymentId;
+
+            try {
+                const response = await apiRequest('/webhook/payment_failed', payload);
+
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.detail || 'Request failed');
+                }
+
+                const data = await response.json();
+                const finalAction = getValue(data, 'policy_decision', 'recommended_action', 'action');
+                const guardrailTriggered = Boolean(getValue(data, 'guardrail_triggered', false));
+                const modelRecommendation = getValue(data, 'model_recommendation');
+                const policyReason = getValue(data, 'policy_reason');
+                const counterfactuals = getValue(data, 'counterfactual_matrix', 'counterfactuals', []);
+                const winnerRow = Array.isArray(counterfactuals) && counterfactuals.length
+                    ? [...counterfactuals].sort((a, b) => safeNumber(getValue(b, 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0)) - safeNumber(getValue(a, 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0)))[0]
+                    : null;
+                const nextBestRow = Array.isArray(counterfactuals) && counterfactuals.length > 1
+                    ? [...counterfactuals].sort((a, b) => safeNumber(getValue(b, 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0)) - safeNumber(getValue(a, 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0)))[1]
+                    : null;
+
+                const expectedNetValue = safeNumber(getValue(data, 'expected_net_recovery_inr', 'net_val', 'expected_net_value', 0));
+                const recoveredProbability = safeNumber(getValue(data, 'calibrated_recovery_probability', 'probability', 'prob', 0));
+                const costsSaved = safeNumber(getValue(data, 'costs_saved_inr', 'costs_saved', 0));
+                const nextBestNet = nextBestRow ? safeNumber(getValue(nextBestRow, 'expected_net_value', 'expected_net_recovery_inr', 'net_val', 0)) : 0;
+                const advantage = expectedNetValue - nextBestNet;
+
+                document.getElementById('resAction').textContent = humanizeAction(finalAction || '--');
+                document.getElementById('resProb').textContent = formatPercent(recoveredProbability);
+                document.getElementById('resNet').textContent = formatCurrency(expectedNetValue);
+                document.getElementById('resSaved').textContent = formatCurrency(costsSaved);
+
+                document.getElementById('finalDecisionLabel').textContent = humanizeAction(finalAction || '--');
+                document.getElementById('finalDecisionNet').textContent = formatCurrency(expectedNetValue);
+                document.getElementById('finalDecisionProb').textContent = formatPercent(recoveredProbability);
+
+                document.getElementById('summaryAction').textContent = humanizeAction(finalAction || '--');
+                document.getElementById('summaryProb').textContent = formatPercent(recoveredProbability);
+                document.getElementById('summaryNet').textContent = formatCurrency(expectedNetValue);
+                document.getElementById('nextBestAlt').textContent = nextBestRow ? humanizeAction(getValue(nextBestRow, 'action_name', 'action', 'name')) : '—';
+                document.getElementById('expectedAdvantage').textContent = formatCurrency(advantage);
+
+                const banner = document.getElementById('statusBanner');
+                const rationale = getValue(data, 'decision_rationale', 'rationale') || 'Decision evaluated successfully.';
+                banner.className = guardrailTriggered ? 'alert warning' : 'alert success';
+                banner.textContent = rationale;
+
+                const decisionBadge = document.getElementById('decisionBadge');
+                decisionBadge.className = guardrailTriggered ? 'pill warn' : 'pill good';
+                decisionBadge.textContent = guardrailTriggered ? 'POLICY OVERRIDE' : 'OPTIMIZED';
+
+                const businessVerdict = document.getElementById('businessVerdict');
+                const nextBestAction = nextBestRow ? humanizeAction(getValue(nextBestRow, 'action_name', 'action', 'name')) : 'No practical alternative';
+                if (guardrailTriggered) {
+                    businessVerdict.textContent = policyReason
+                        ? `The model preferred ${humanizeAction(modelRecommendation)}, but policy guardrails blocked automated execution because ${policyReason.toLowerCase()}`
+                        : `The model recommendation was overridden by policy guardrails. Human review is required before execution.`;
+                } else if (winnerRow) {
+                    businessVerdict.textContent = `${humanizeAction(finalAction)} currently produces the highest expected net value under the active conditions. The next-best alternative, ${nextBestAction}, is ${formatCurrency(Math.max(0, expectedNetValue - nextBestNet))} below optimal.`;
+                } else {
+                    businessVerdict.textContent = 'The current environment does not support an economically attractive recovery action.';
+                }
+
+                const retryRow = Array.isArray(counterfactuals)
+                    ? counterfactuals.find((row) => getValue(row, 'action_name', 'action', 'name') === 'RETRY_IMMEDIATE')
+                    : null;
+                const retryProbability = retryRow ? safeNumber(getValue(retryRow, 'probability', 'prob', 0)) : 0;
+                const retryNet = retryRow ? safeNumber(getValue(retryRow, 'expected_net_value', 'net_val', 0)) : 0;
+
+                const whyRetryTitle = document.getElementById('whyNotRetryTitle');
+                if (finalAction && finalAction !== 'RETRY_IMMEDIATE') {
+                    whyRetryTitle.textContent = 'WHY NOT RETRY?';
+                    document.getElementById('whyNotRetry').textContent = `Immediate Retry: P(Recovery) ${formatPercent(retryProbability)}, Expected Net ${formatCurrency(retryNet)}. Winning Action: ${humanizeAction(finalAction)} has an expected net of ${formatCurrency(expectedNetValue)}. Expected value difference: ${formatCurrency(Math.max(0, expectedNetValue - retryNet))}. Immediate retry is not the economically optimal action under the current conditions.`;
+                } else {
+                    whyRetryTitle.textContent = 'WHY RETRY?';
+                    document.getElementById('whyNotRetry').textContent = nextBestRow
+                        ? `Immediate retry currently provides the highest expected net value. The next best action is ${humanizeAction(getValue(nextBestRow, 'action_name', 'action', 'name'))} with ${formatCurrency(nextBestNet)}. Advantage: ${formatCurrency(Math.max(0, expectedNetValue - nextBestNet))}.`
+                        : 'Immediate retry remains the strongest option under current conditions.';
+                }
+
+                document.getElementById('traceEventId').textContent = `evt_${paymentId}`;
+                document.getElementById('tracePaymentId').textContent = paymentId;
+                document.getElementById('traceAmount').textContent = formatCurrency(Number(document.getElementById('amount').value));
+                document.getElementById('traceFailureCode').textContent = document.getElementById('failureCode').value;
+                document.getElementById('traceModel').textContent = humanizeAction(modelRecommendation || finalAction);
+                document.getElementById('tracePolicy').textContent = guardrailTriggered ? 'GUARDRAIL OVERRIDE' : 'PASSED';
+                document.getElementById('traceAction').textContent = humanizeAction(finalAction);
+                document.getElementById('traceNet').textContent = formatCurrency(expectedNetValue);
+
+                const modelPolicyText = document.getElementById('modelPolicyText');
+                modelPolicyText.innerHTML = `
+                    <strong>Model Recommendation:</strong> ${humanizeAction(modelRecommendation || finalAction)}<br>
+                    <strong>Policy Check:</strong> ${guardrailTriggered ? 'High-value / risk guardrail triggered' : 'Passed'}<br>
+                    <strong>Final Action:</strong> ${humanizeAction(finalAction)}
+                `;
+
+                setEnvironmentBanner(document.getElementById('bankOutage').checked);
+                setEventStatus('PROCESSED', 'Processed successfully');
+                processedPaymentIds.add(paymentId);
+                renderMatrix(counterfactuals, finalAction);
+
+                const flowBadge = document.getElementById('flowBadge');
+                flowBadge.className = guardrailTriggered ? 'pill warn' : 'pill good';
+                flowBadge.textContent = guardrailTriggered ? 'Guardrail' : 'Pass';
+
+                const flowDescription = document.getElementById('flowDescription');
+                flowDescription.textContent = guardrailTriggered
+                    ? `ML Prediction (${humanizeAction(modelRecommendation)}) → Policy Guardrail Blocked → Economic Optimization → Human Review`
+                    : 'ML Prediction → Policy Guardrails → Economic Optimization → Action Execution';
+
+                const flowSteps = document.querySelectorAll('.flow-step');
+                flowSteps.forEach((step, index) => {
+                    const isGuardrailStep = index === 1;
+                    step.classList.toggle('active', !guardrailTriggered || index !== 1);
+                    step.classList.toggle('blocked', guardrailTriggered && isGuardrailStep);
+                });
+
+                document.getElementById('matrixBadge').textContent = guardrailTriggered ? 'POLICY OVERRIDE' : 'REGRET ANALYSIS';
+                document.getElementById('eventPaymentId').textContent = paymentId;
+            } catch (error) {
+                const msg = error.message || 'Unable to reach the RecoverAI API.';
+                setEventStatus('DUPLICATE BLOCKED', msg);
+                const banner = document.getElementById('statusBanner');
+                banner.className = 'alert warning';
+                banner.textContent = msg;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Run AI Optimization';
+            }
+        });
+
+        document.getElementById('eventPaymentId').textContent = generateDemoPaymentId();
+        document.getElementById('payment_id').value = document.getElementById('eventPaymentId').textContent;
+        updateBankOutageState();
+        setEventStatus('READY', 'EVENT READY ✓ New payment event generated');
+        setEnvironmentBanner(false);
+    </script>
+</body>
+</html>
