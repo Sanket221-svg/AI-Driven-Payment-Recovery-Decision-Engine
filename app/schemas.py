@@ -3,6 +3,7 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 class PaymentFailureEvent(BaseModel):
+    event_id: Optional[str] = Field(default=None, example="evt_pay_demo_100231_20260830T120000Z")
     payment_id: str = Field(..., example="pay_demo_100231")
     customer_id: str = Field(default="cust_default")
     merchant_id: str = Field(default="mch_default")
@@ -14,6 +15,8 @@ class PaymentFailureEvent(BaseModel):
     customer_success_rate: float = Field(default=0.85, ge=0.0, le=1.0)
     customer_value: str = Field(default="HIGH")
     simulate_bank_outage: bool = Field(default=False, description="Stress test toggle")
+    customer_opt_out: bool = Field(default=False)
+    retry_count: Optional[int] = Field(default=None)
     created_at: Optional[str] = Field(default_factory=lambda: datetime.now().strftime("%d-%m-%Y %H:%M"))
 
 class ActionSimulation(BaseModel):
